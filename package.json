@@ -11,5 +11,8 @@
     "log"
   ],
   "author": "moritz.roessler@gmail.com",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "rollup-plugin-commonjs": "^10.1.0"
+  }
 }
