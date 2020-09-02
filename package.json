@@ -1,0 +1,15 @@
+{
+  "name": "log",
+  "version": "0.0.1",
+  "description": "A simple Logger featuring transports and formatters.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "bundle": "rollup index.js --format iife --name 'Logger' --file ./dist/Logger.js"
+  },
+  "keywords": [
+    "log"
+  ],
+  "author": "moritz.roessler@gmail.com",
+  "license": "ISC"
+}
