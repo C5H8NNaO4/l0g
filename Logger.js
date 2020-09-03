@@ -1,5 +1,5 @@
 const {getLine} = require('./util');
-const {Transport} = require('./transports')
+const {Transport, ConsoleTransport} = require('./transports')
 const levels = require('./levels');
 class Logger {
   constructor(level, options = {}) {
@@ -59,7 +59,7 @@ Logger.defaults = {
 };
 
 Logger.prototype[Symbol.toStringTag] = 'Hi'
-Logger.prototype.transports = [Transport.default];
+Logger.prototype.transports = [new ConsoleTransport];
 Logger.prototype.gather = {
   ts: () => +new Date,
   loc: () => getLine(3),

@@ -4041,16 +4041,12 @@
 	});
 
 	const parseStack = (stack, o = 3) => {
-	  // const lines = stack.toString().split('\n');
-	  // const line = lines[o];
-	  // const [,method] = line.match(/at (.+)? /)
-	  // const [,file,row,col] = line.match(/.+\\(.+?\..+?):(\d+):(\d+)\)/)
 	  let st = new stacktracey(stack);
 	  let top = st.items[o]; //st.withSourceAt (4)
-	  // const top = st.withSourceAt(st.items[o]);
 	  const {file, line, column, fileName} = top;
 	  return {file, line, column, fileName}
 	};
+
 	const getLine = (offset = 0) => {
 	  try {
 	    throw new Error ('Test');
@@ -9973,7 +9969,7 @@
 	};
 
 	const {getLine: getLine$1} = util$1;
-	const {Transport: Transport$3} = transports;
+	const {Transport: Transport$3, ConsoleTransport: ConsoleTransport$2} = transports;
 
 	class Logger {
 	  constructor(level, options = {}) {
@@ -10033,7 +10029,7 @@
 	};
 
 	Logger.prototype[Symbol.toStringTag] = 'Hi';
-	Logger.prototype.transports = [Transport$3.default];
+	Logger.prototype.transports = [new ConsoleTransport$2];
 	Logger.prototype.gather = {
 	  ts: () => +new Date,
 	  loc: () => getLine$1(3),
