@@ -1,7 +1,10 @@
 const {Logger} = require('./Logger');
 const transports = require('./transports');
 
-module.exports = {
+const exports = {
   Logger,
   transports
-}
+};
+if (window)
+  window.Logger = exports;
+module.exports = exports;

@@ -1,4 +1,4 @@
-(function (exports) {
+(function () {
   'use strict';
 
   const parseStack = (stack, o = 3) => {
@@ -5986,17 +5986,14 @@
   const {Logger: Logger$1} = Logger_1;
 
 
-  var _000Log = {
+  const exports$1 = {
     Logger: Logger$1,
     transports
   };
-  var _000Log_1 = _000Log.Logger;
-  var _000Log_2 = _000Log.transports;
+  if (window)
+    window.Logger = exports$1;
+  var _000Log = exports$1;
 
-  exports.Logger = _000Log_1;
-  exports.default = _000Log;
-  exports.transports = _000Log_2;
+  return _000Log;
 
-  return exports;
-
-}({}));
+}());
