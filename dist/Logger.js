@@ -4048,7 +4048,8 @@
 	  let st = new stacktracey(stack);
 	  let top = st.items[o]; //st.withSourceAt (4)
 	  // const top = st.withSourceAt(st.items[o]);
-	  return ({file, line, column, fileName} = top);
+	  const {file, line, column, fileName} = top;
+	  return {file, line, column, fileName}
 	};
 	const getLine = (offset = 0) => {
 	  try {

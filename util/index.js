@@ -8,7 +8,8 @@ const parseStack = (stack, o = 3) => {
   let st = new StackTracey(stack);
   let top = st.items[o]; //st.withSourceAt (4)
   // const top = st.withSourceAt(st.items[o]);
-  return ({file, line, column, fileName} = top);
+  const {file, line, column, fileName} = top;
+  return {file, line, column, fileName}
   console.log(st.items[o], o, top);
   process.exit(0);
   return {file, method, row, col, top}
