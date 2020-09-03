@@ -19,111 +19,6 @@
 
   var util = {getLine};
 
-  const levels = { 
-    error: 0, 
-    warn: 1, 
-    info: 2, 
-    http: 3,
-    verbose: 4, 
-    debug: 5, 
-    silly: 6 
-  };
-
-  var npm = levels;
-
-  const levels$1 = { 
-    emerg: 0, 
-    alert: 1, 
-    crit: 2, 
-    error: 3, 
-    warning: 4, 
-    notice: 5, 
-    info: 6, 
-    debug: 7
-  };
-
-  var rfc5424 = levels$1;
-
-  var levels$2 = {
-    npm: npm,
-    rfc5424: rfc5424,
-  };
-
-  const {getLine: getLine$1} = util;
-
-  class Logger {
-    constructor(level, options = {}) {
-      const {transports, gather = null, levels = Logger.defaults.levels} = options;
-
-      this.level = level;
-      this.levels = Logger.levels[levels];
-
-      if (gather) 
-        this.gather = gather;
-
-      if (transports)
-        this.transports = transports;
-
-      for (const level in this.levels) {
-        this[level] = this.log.bind(this,level);
-      }
-      // return new Proxy(this, proxyHandler);
-    }
-
-    log (level, ...args) {
-      let [message, ...args1] = args;
-      let [options = {}] = args1;
-      if (level.raw && Array.isArray(message)) {
-        message = level;
-      }
-      if (this.levels[level] > this.levels[this.level]) return;
-      if (level.raw && Array.isArray(args)) {
-        
-        options = {};
-        options.tag = [level, ...args];
-        message = null;
-        level = 'info';
-      } else if (message.raw && args.length > 0) {
-      
-
-        options = {};
-        options.tag = [message, ...args1];
-        message = null;
-        
-      }
-      options.message = message;
-      gather(this, options, {level});
-      this.broadcast(options);
-    }
-
-    broadcast (options) {
-      for (const transport of this.transports) {
-        transport.log({...options});
-      }
-    }
-  }
-
-  Logger.levels = levels$2;
-  Logger.defaults = {
-    levels: 'rfc5424'
-  };
-
-  Logger.prototype[Symbol.toStringTag] = 'Hi';
-  Logger.prototype.transports = [Transport.default];
-  Logger.prototype.gather = {
-    ts: () => +new Date,
-    loc: () => getLine$1(3),
-  };
-
-  function gather (instance, options, add) {
-    for (const key in instance.gather) {
-      options[key] = instance.gather[key]();
-    }
-    Object.assign(options, add);
-  }
-
-  var Logger_1 = {Logger};
-
   const tag = (strs, ...vals) => {
     return strs.reduce((str, val, i) => {
       return str + vals[i-1] + val;
@@ -5958,7 +5853,7 @@
   };
 
   const {Formatter: Formatter$3} = formatters;
-  class Transport$1 {
+  class Transport {
     constructor (options = {}) {
       this.formatter = options.formatter || new Formatter$3;
     }
@@ -5981,12 +5876,12 @@
   // Transport.default = new ConsoleTransport;
 
   var Transport_1 = {
-    Transport: Transport$1
+    Transport
   };
 
-  const {Transport: Transport$2} = Transport_1;
+  const {Transport: Transport$1} = Transport_1;
 
-  class ConsoleTransport extends Transport$2 {
+  class ConsoleTransport extends Transport$1 {
     static logFns = {
       warning: console.warn,
     };
@@ -6005,14 +5900,120 @@
 
   var ConsoleTransport_1 = {ConsoleTransport};
 
-  const {Transport: Transport$3} = Transport_1;
+  const {Transport: Transport$2} = Transport_1;
   const {ConsoleTransport: ConsoleTransport$1} = ConsoleTransport_1;
   // const {FileTransport} = require('./FileTransport');
   // const {PostgresTransport} = require('./PostgresTransport');
 
   var transports = {
-    Transport: Transport$3, ConsoleTransport: ConsoleTransport$1
+    Transport: Transport$2, ConsoleTransport: ConsoleTransport$1
   };
+
+  const levels = { 
+    error: 0, 
+    warn: 1, 
+    info: 2, 
+    http: 3,
+    verbose: 4, 
+    debug: 5, 
+    silly: 6 
+  };
+
+  var npm = levels;
+
+  const levels$1 = { 
+    emerg: 0, 
+    alert: 1, 
+    crit: 2, 
+    error: 3, 
+    warning: 4, 
+    notice: 5, 
+    info: 6, 
+    debug: 7
+  };
+
+  var rfc5424 = levels$1;
+
+  var levels$2 = {
+    npm: npm,
+    rfc5424: rfc5424,
+  };
+
+  const {getLine: getLine$1} = util;
+  const {Transport: Transport$3} = transports;
+
+  class Logger {
+    constructor(level, options = {}) {
+      const {transports, gather = null, levels = Logger.defaults.levels} = options;
+
+      this.level = level;
+      this.levels = Logger.levels[levels];
+
+      if (gather) 
+        this.gather = gather;
+
+      if (transports)
+        this.transports = transports;
+
+      for (const level in this.levels) {
+        this[level] = this.log.bind(this,level);
+      }
+      // return new Proxy(this, proxyHandler);
+    }
+
+    log (level, ...args) {
+      let [message, ...args1] = args;
+      let [options = {}] = args1;
+      if (level.raw && Array.isArray(message)) {
+        message = level;
+      }
+      if (this.levels[level] > this.levels[this.level]) return;
+      if (level.raw && Array.isArray(args)) {
+        
+        options = {};
+        options.tag = [level, ...args];
+        message = null;
+        level = 'info';
+      } else if (message.raw && args.length > 0) {
+      
+
+        options = {};
+        options.tag = [message, ...args1];
+        message = null;
+        
+      }
+      options.message = message;
+      gather(this, options, {level});
+      this.broadcast(options);
+    }
+
+    broadcast (options) {
+      for (const transport of this.transports) {
+        transport.log({...options});
+      }
+    }
+  }
+
+  Logger.levels = levels$2;
+  Logger.defaults = {
+    levels: 'rfc5424'
+  };
+
+  Logger.prototype[Symbol.toStringTag] = 'Hi';
+  Logger.prototype.transports = [Transport$3.default];
+  Logger.prototype.gather = {
+    ts: () => +new Date,
+    loc: () => getLine$1(3),
+  };
+
+  function gather (instance, options, add) {
+    for (const key in instance.gather) {
+      options[key] = instance.gather[key]();
+    }
+    Object.assign(options, add);
+  }
+
+  var Logger_1 = {Logger};
 
   const {Logger: Logger$1} = Logger_1;
 
