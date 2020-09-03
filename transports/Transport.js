@@ -1,5 +1,5 @@
 const fs = require('fs');
-const {Formatter} = require('../Format')
+const {Formatter} = require('../formatters')
 class Transport {
   constructor (options = {}) {
     this.formatter = options.formatter || new Formatter;

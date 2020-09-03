@@ -1,30 +1,4 @@
-const levels = require('./levels')
-const {Transport, FileTransport, ConsoleTransport, PostgresTransport} = require('./transports')
-const {Simple, Combine, Inspect} = require('./Format');
-
-const parseStack = (stack, o = 3) => {
-  const lines = stack.toString().split('\n');
-  const line = lines[o];
-  const [,method] = line.match(/at (.+)? /)
-  const [,file,row,col] = line.match(/.+\\(.+?\..+?):(\d+):(\d+)\)/)
-  return {file, method, row, col}
-}
-const getLine = (offset = 0) => {
-  try {
-    throw new Error ('Test');
-  } catch (e) {
-    const info = parseStack (e.stack, offset + 2)
-    return info;
-  }
-}
-const proxyHandler = {
-  get: function(target, prop, receiver) {
-    if (typeof target[prop] !== 'undefined') return target[prop];
-    
-    return prop.toString();
-  }
-};
-
+const {getLine} = require('./util');
 class Logger {
   constructor(level, options = {}) {
     const {transports, gather = null, levels = Logger.defaults.levels} = options;
@@ -95,18 +69,5 @@ function gather (instance, options, add) {
   }
   Object.assign(options, add);
 }
-const transports = [
-  new ConsoleTransport({formatter: new Simple}), 
-  new FileTransport('test.log'),
-  new PostgresTransport('psql://postgres:password@localhost/kruch')
-]
-const logger = new Logger('debug', {transports});
-
-logger.log`Hey ${"asd"} ${1234} ${{foo:'bar'}}`
-logger.warning('Warning')
-logger.warning`Warning ${1234}`
-logger.error`Custom Error (${new Error('TestException')})`
-let util = require('util')
-console.log(util.inspect({a:'b'}))
 
 module.exports = {Logger};

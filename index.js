@@ -1,7 +1,7 @@
 const {Logger} = require('./Logger');
-const Transports = require('./transports');
+const transports = require('./transports');
 
 module.exports = {
   Logger,
-  Transports
+  transports
 }

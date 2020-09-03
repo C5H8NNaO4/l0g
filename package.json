@@ -13,6 +13,7 @@
   "author": "moritz.roessler@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "rollup-plugin-commonjs": "^10.1.0"
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0"
   }
 }
