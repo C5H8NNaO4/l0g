@@ -1,4 +1,5 @@
 const {getLine} = require('./util');
+const levels = require('./levels');
 class Logger {
   constructor(level, options = {}) {
     const {transports, gather = null, levels = Logger.defaults.levels} = options;

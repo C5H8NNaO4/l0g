@@ -19,7 +19,38 @@
 
   var util = {getLine};
 
+  const levels = { 
+    error: 0, 
+    warn: 1, 
+    info: 2, 
+    http: 3,
+    verbose: 4, 
+    debug: 5, 
+    silly: 6 
+  };
+
+  var npm = levels;
+
+  const levels$1 = { 
+    emerg: 0, 
+    alert: 1, 
+    crit: 2, 
+    error: 3, 
+    warning: 4, 
+    notice: 5, 
+    info: 6, 
+    debug: 7
+  };
+
+  var rfc5424 = levels$1;
+
+  var levels$2 = {
+    npm: npm,
+    rfc5424: rfc5424,
+  };
+
   const {getLine: getLine$1} = util;
+
   class Logger {
     constructor(level, options = {}) {
       const {transports, gather = null, levels = Logger.defaults.levels} = options;
@@ -72,7 +103,7 @@
     }
   }
 
-  Logger.levels = levels;
+  Logger.levels = levels$2;
   Logger.defaults = {
     levels: 'rfc5424'
   };
