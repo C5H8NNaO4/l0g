@@ -2,11 +2,14 @@ const {Logger} = require('./Logger');
 const transports = require('./transports');
 const formatters = require('./formatters');
 
-const exports = {
+const exprts = {
   Logger,
   transports,
-  formatters,
+  formatters
 };
+
+console.log ("Init", exprts)
 if (window)
-  window.Logger = exports;
-module.exports = exports;
+  window.clog = exprts;
+
+module.exports = exprts;
