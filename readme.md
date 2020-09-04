@@ -35,7 +35,7 @@ logger.log`Hello World! Numbers: ${1234} Strings: ${'foo'} Objects: ${{foo:'bar'
 
 ><span style="color:rgb(0,128,0)">2020-09-04T20:22:56.781Z</span> <span style="color:rgb(0,128,0)">info</span>: Hello World! Numbers: <span style="color:rgb(0,255,255)">1234</span> Strings: <span style="color:rgb(0,255,0)">foo</span> Objects: [object Object]
 
-As you might have noticed, the object passed to the tag function get's logged as "[object Object]". That's because the `ColorFormatter` can be used in the Browser as well and there is no `util.inspect` available.
+As you might have noticed, the object passed to the tag function get's logged as "[object Object]". That's because the `ColorFormatter` intends to be used in the Browser as well and there is no `util.inspect` available.
 
 There are multiple ways to solve this. The easiest is probably to add `util.inspect` to the `formatMap` of the `ColorFormatter` which will be used by its *Tagged Template* function.
 
@@ -51,3 +51,5 @@ logger.log`Hello World! Numbers: ${1234} Strings: ${'foo'} Objects: ${{foo:'bar'
 ```
 ><span style="color:rgb(0,128,0)">2020-09-04T20:30:53.353Z</span> <span style="color:rgb(0,128,0)">info</span>: Hello World! Numbers: <span style="color:rgb(0,255,255)">1234</span> Strings: <span style="color:rgb(0,255,0)">foo</span> Objects: [object Object]  
 ><span style="color:rgb(0,128,0)">2020-09-04T20:30:53.356Z</span> <span style="color:rgb(0,128,0)">info</span>: Hello World! Numbers: <span style="color:rgb(0,255,255)">1234</span> Strings: <span style="color:rgb(0,255,0)">foo</span> Objects: { foo: <span style="color:rgb(0,187,0)">'bar'</span> }
+
+![images/examples.color.png](images/examples.color.png)
