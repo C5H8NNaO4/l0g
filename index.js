@@ -5,7 +5,7 @@ const formatters = require('./formatters');
 const exprts = {
   Logger,
   transports,
-  formatters
+  formatters,
 };
 
 console.log ("Init", exprts)

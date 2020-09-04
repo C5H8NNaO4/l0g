@@ -3093,7 +3093,7 @@ const formatters = require('./formatters');
 const exprts = {
   Logger,
   transports,
-  formatters
+  formatters,
 };
 
 console.log ("Init", exprts)
@@ -7731,13 +7731,13 @@ module.exports = {
 }
 },{"../formatters":13,"fs":1}],43:[function(require,module,exports){
 const {Transport} = require('./Transport');
-const {ConsoleTransport} = require('./ConsoleTransport');
+const {ConsoleTransport, Table} = require('./ConsoleTransport');
 const {ChromeTransport} = require('./ChromeTransport');
 // const {FileTransport} = require('./FileTransport');
 // const {PostgresTransport} = require('./PostgresTransport');
 
 module.exports = {
-  Transport, ConsoleTransport, ChromeTransport
+  Transport, ConsoleTransport, ChromeTransport, Table
 }
 },{"./ChromeTransport":40,"./ConsoleTransport":41,"./Transport":42}],44:[function(require,module,exports){
 const StackTracey = require('stacktracey');
