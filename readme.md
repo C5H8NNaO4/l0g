@@ -19,7 +19,7 @@ logger.log`Hello World`
 
 To support colors, you need to specify a `Formatter` that supports coloring. The `ColorFormatter` provides a flexible way of formatting *(almost)* every aspect of your log message using ES6 `Map`s.
 
-```
+```javascript
 const {Logger} = require('../Logger');
 const {ConsoleTransport} = require('../transports')
 const {Color} = require('../formatters/Color');
@@ -39,11 +39,11 @@ As you might have noticed, the object passed to the tag function get's logged as
 
 There are multiple ways to solve this. The easiest is probably to add `util.inspect` to the `formatMap` of the `ColorFormatter` which will be used by its *Tagged Template* function.
 
-```
+```javascript
 Color.formatMap.get(Color.isObject).unshift(v => util.inspect(v, true, false, 12, true))
 ```
 *Note:* This will change the behaviour of **all** instances of `ColorFormatter` as this is the default `Map` used by the instance.
-```
+```javascript
 const util = require('util');
 logger.log`Hello World! Numbers: ${1234} Strings: ${'foo'} Objects: ${{foo:'bar'}}`;
 Color.formatMap.get(Color.isObject).unshift(v => util.inspect(v, true, false, 12, true))
