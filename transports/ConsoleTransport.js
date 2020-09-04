@@ -32,12 +32,12 @@ class Table extends TransportFeature {
     if (!options.group) return this.log(options);
     const {level, message} = this.format(options);
     const {args = [message]} = options.console || {};
-    console.groupCollapsed(...args);
-    // console.log(options);
-    console.table(options.group.table.data);
-    // const logFn = ConsoleTransport.logFns[level] || console.log;
-    // logFn.call(console, message);
-    console.groupEnd();
+    _console.groupCollapsed(...args);
+    // _console.log(options);
+    _console.table(options.group.table.data);
+    // const logFn = ConsoleTransport.logFns[level] || _console.log;
+    // logFn.call(_console, message);
+    _console.groupEnd();
   }
 }
 
