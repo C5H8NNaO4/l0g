@@ -7629,6 +7629,7 @@ class ChromeTransport extends ConsoleTransport {
     const args = styledConsoleLog(styled);
     options.console = options.console || {};
     options.console.args = args;
+    return options;
   }
   log (options) {
     this.format(options);
