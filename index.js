@@ -8,7 +8,6 @@ const exprts = {
   formatters,
 };
 
-console.log ("Init", exprts)
 if (typeof window !== 'undefined')
   window.clog = exprts;
 

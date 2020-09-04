@@ -19,7 +19,6 @@ class Logger {
     }
 
     for (const transport of this.transports) {
-      console.log('features', transport, transport.features)
       for (const feature of transport.features)
       feature.register.call(this, Logger);
     }
