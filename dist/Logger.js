@@ -7666,8 +7666,8 @@ class Table extends TransportFeature {
   log (options) {
     if (!options.group) return this.log(options);
     const {level, message} = this.format(options);
-    const {args = []} = options.console || {};
-    console.groupCollapsed(message, ...args);
+    const {args = [message]} = options.console || {};
+    console.groupCollapsed(...args);
     // console.log(options);
     console.table(options.group.table.data);
     // const logFn = ConsoleTransport.logFns[level] || console.log;
