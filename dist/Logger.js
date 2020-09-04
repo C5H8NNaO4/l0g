@@ -2849,7 +2849,14 @@ class Logger {
     for (const level in this.levels) {
       this[level] = this.log.bind(this,level);
     }
+
+    for (const transport of this.transports) {
+      console.log('features', transport, transport.features)
+      for (const feature of transport.features)
+      feature.register.call(this, Logger);
+    }
     // return new Proxy(this, proxyHandler);
+    this.meta = {};
   }
 
   log (level, ...args) {
@@ -2874,16 +2881,20 @@ class Logger {
       
     }
     options.message = message;
-    gather(this, options, {level});
-    this.broadcast(options);
+    gather(this, options, {level, ...this.meta});
+    broadcast.call(this, options);
+
+    this.meta = {};
   }
 
-  broadcast (options) {
-    for (const transport of this.transports) {
-      transport.log({...options});
-    }
-  }
+
 }
+
+function broadcast (options) {
+  for (const transport of this.transports) {
+    transport.send({...options});
+  }
+};
 
 Logger.levels = levels;
 Logger.defaults = {
@@ -7626,6 +7637,38 @@ module.exports = {
 },{"./ConsoleTransport":41,"ansi_up":18}],41:[function(require,module,exports){
 const {Transport} = require('./Transport');
 
+class TransportFeature {
+  constructor () {
+
+  }
+  register () {
+
+  }
+}
+
+class Table extends TransportFeature {
+  register (Logger) {
+    Logger.prototype.table = Table.prototype.run;
+  }
+
+  run (data) {
+    this.meta.group = this.meta.group || {};
+    this.meta.group.table = {data};
+    return this;
+  }
+
+  log (options) {
+    if (!options.group) return this.log(options);
+    const {level, message} = this.format(options);
+    console.groupCollapsed(message)
+    // console.log(options);
+    console.table(options.group.table.data);
+    // const logFn = ConsoleTransport.logFns[level] || console.log;
+    // logFn.call(console, message);
+    console.groupEnd();
+  }
+}
+
 class ConsoleTransport extends Transport {
   static logFns = {
     warning: console.warn,
@@ -7643,13 +7686,16 @@ class ConsoleTransport extends Transport {
   }
 }
 
-module.exports = {ConsoleTransport};
+
+module.exports = {ConsoleTransport, Table};
 },{"./Transport":42}],42:[function(require,module,exports){
 const fs = require('fs');
 const {Formatter} = require('../formatters')
 class Transport {
   constructor (options = {}) {
-    this.formatter = options.formatter || new Formatter;
+    const {formatter = new Formatter, features = []} = options;
+    this.formatter = formatter;
+    this.features = features;
   }
 
   log (options) {
@@ -7663,6 +7709,16 @@ class Transport {
       options.message = Formatter.format(this.formatter, options);
     }
     return options;
+  }
+
+  send (options) {
+    if (this.features) {
+      for (const feat of this.features) {
+        this.currentFeature = feat;
+        if (feat.log) return feat.log.call(this, options);
+      }
+    }
+    return this.log(options);
   }
 }
 
