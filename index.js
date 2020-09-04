@@ -9,7 +9,7 @@ const exprts = {
 };
 
 console.log ("Init", exprts)
-if (window)
+if (typeof window !== undefined)
   window.clog = exprts;
 
 module.exports = exprts;
