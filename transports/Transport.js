@@ -17,6 +17,8 @@ class Transport {
     if (this.formatter instanceof Formatter) {
       options.message = Formatter.format(this.formatter, options);
     }
+    if (this.transform)
+      options = this.transform(options)
     return options;
   }
 

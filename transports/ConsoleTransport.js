@@ -22,8 +22,9 @@ class Table extends TransportFeature {
 
   log (options) {
     if (!options.group) return this.log(options);
-    const {level, message} = this.format(options);
-    console.groupCollapsed(message)
+    const {level, message, console = {}} = this.format(options);
+    const {args = []} = console;
+    console.groupCollapsed(message, ...args);
     // console.log(options);
     console.table(options.group.table.data);
     // const logFn = ConsoleTransport.logFns[level] || console.log;

@@ -7619,15 +7619,20 @@ function styledConsoleLog() {
       }
   }
 
+  return argArray;
   console.log.apply(console, argArray);
 }
 
 class ChromeTransport extends ConsoleTransport {
+  transform (options) {
+    const styled = ansi_up.ansi_to_html(options.message)
+    const args = styledConsoleLog(styled);
+    options.console = options.console || {};
+    options.console.args = args;
+  }
   log (options) {
     this.format(options);
-
-    const message = ansi_up.ansi_to_html(options.message);
-    styledConsoleLog(message);
+    console.log.apply(console, options.console.args);
   }
 }
 
@@ -7659,8 +7664,9 @@ class Table extends TransportFeature {
 
   log (options) {
     if (!options.group) return this.log(options);
-    const {level, message} = this.format(options);
-    console.groupCollapsed(message)
+    const {level, message, console = {}} = this.format(options);
+    const {args = []} = console;
+    console.groupCollapsed(message, ...args);
     // console.log(options);
     console.table(options.group.table.data);
     // const logFn = ConsoleTransport.logFns[level] || console.log;
@@ -7708,6 +7714,8 @@ class Transport {
     if (this.formatter instanceof Formatter) {
       options.message = Formatter.format(this.formatter, options);
     }
+    if (this.transform)
+      options = this.transform(options)
     return options;
   }
 
