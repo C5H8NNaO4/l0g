@@ -6,14 +6,13 @@ class FileTransport extends Transport {
     super(options);
 
     // if (!fs.existsSync(filename))
-    this.options = options;
+    // this.options = options;
     this.fs = fs.createWriteStream(filename, {
       flags: 'a'
     });
   }
 
   log (options) {
-    options = this.format(options)
     this.fs.write(options.message + '\n');
   }
 }

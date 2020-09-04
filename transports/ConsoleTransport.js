@@ -9,12 +9,13 @@ function bind(that, obj) {
 }
 const _console = bind(console, console);
 
-const swallow = key => (...args) => {
-  if (ConsoleTransport.swallow === true) return;
+const supress = key => (...args) => {
+  if (ConsoleTransport.supress === true) return;
   return _console[key].apply(console, args);
 };
+
 for (const key in console)
-  console[key] = swallow(key);
+  console[key] = supress(key);
 
 class TransportFeature {
   constructor () {
@@ -37,19 +38,43 @@ class Table extends TransportFeature {
   }
 
   log (options) {
+    //this actually refers to the Transport instance as its being .called to give access to its functions
+    //this comment might be a sign of bad code, maybe it's better to give up having the same signature for the log
+    //function and pass the Transport instance as second parameter
     if (!options.group) return this.log(options);
-    const {level, message} = this.format(options);
-    const {args = [message]} = options.console || {};
-    _console.groupCollapsed(...args);
-    // _console.log(options);
-    _console.table(options.group.table.data);
-    // const logFn = ConsoleTransport.logFns[level] || _console.log;
-    // logFn.call(_console, message);
-    _console.groupEnd();
+    const args = ConsoleTransport.getOptionalArgs(options)
+    
+    ConsoleTransport.unsurpressed(() => {
+      console.groupCollapsed(...args);
+      console.table(options.group.table.data);
+      console.groupEnd();
+    })
   }
 }
 
+// class Highlight extends TransportFeature {
+//   register (Logger) {
+//     Logger.prototype.table = Table.prototype.run;
+//   }
+
+//   run (data) {
+//     this.formatter.formatMap.set(data, v => )
+//     return this;
+//   }
+// }
 class ConsoleTransport extends Transport {
+  constructor(options) {
+    super(options)
+  }
+  
+  log (options) {
+    const {level} = options
+    const logFn = ConsoleTransport.logFns[level] || _console.log;
+    const args = ConsoleTransport.getOptionalArgs(options)
+    if (logFn)
+      logFn.apply(console, args);
+  }
+
   static logFns = {
     warning: _console.warn,
     error: _console.error,
@@ -57,15 +82,20 @@ class ConsoleTransport extends Transport {
     info: _console.info,
   };
 
-  constructor(options) {
-    super(options)
+  static supress = false;
+
+  //Overriding console.log breaks console.table on node.js. This doesn't happen in the browser. If some code needs to use console.table, they can use this function.
+  static unsurpressed = fn => {
+    const {supress} = ConsoleTransport;
+    ConsoleTransport.supress = false;
+    fn();
+    ConsoleTransport.supress = supress;
   }
-  
-  log (options) {
-    const {level, message} = this.format(options);
-    const logFn = ConsoleTransport.logFns[level] || _console.log;
-    if (logFn)
-      logFn.call(console, message);
+
+  static getOptionalArgs = options => {
+    const {console = {}, message} = options;
+    const {args = [message]} = console;
+    return args;
   }
 }
 

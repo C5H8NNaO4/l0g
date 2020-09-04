@@ -7,12 +7,22 @@ class Formatter {
       this._format = fn;
   }
 
+  transformTagArgs (...args) {
+    return args;
+  }
+
   transform (options) {
+    if (Array.isArray(options.tag) && options.tag[0].raw) {
+      options.tag = this.transformTagArgs(...options.tag);
+      options.message = this.tag(...options.tag);
+    }
+    
     options.ts = this.constructor.timestamp(options.ts);
+
     return options;
   }
 
-  format ( options) {
+  format (options) {
     const {ts, level, message} = options;
     if (this._format)
       return this._format(options);
@@ -23,21 +33,21 @@ class Formatter {
     return moment(ts).toISOString();
   }
 
-  static transform (instance, options) {
-    // if (typeof instance.transformTag === 'function')
-    //   options.tag = 
-    if (Array.isArray(options.tag) && options.tag[0].raw)
-      options.message = instance.tag(...options.tag);
+  // static transform (instance, options) {
+  //   // if (typeof instance.transformTag === 'function')
+  //   //   options.tag = 
+  //   if (Array.isArray(options.tag) && options.tag[0].raw)
+  //     options.message = instance.tag(...options.tag);
 
-    if (typeof instance.transform === 'function')
-      options = instance.transform(options);
+  //   if (typeof instance.transform === 'function')
+  //     options = instance.transform(options);
 
 
-    return options;
-  }
+  //   return options;
+  // }
 
   static format (instance, options) {
-    options = Formatter.transform(instance, options);
+    options = instance.transform(options) //Formatter.transform(instance, options);
     return instance.format(options);
   }
 }

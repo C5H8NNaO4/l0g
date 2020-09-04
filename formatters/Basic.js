@@ -1,7 +1,7 @@
-const {FnMap, oftype} = require('./Map');
+const {MapFormatter, oftype} = require('./MapFormatter');
 const util = require('util');
 
-class Basic extends FnMap {
+class Basic extends MapFormatter {
   static formatMap = new Map([
     [oftype('string'), v => util.inspect(v)],
     [v => v instanceof Error, e => e.message],

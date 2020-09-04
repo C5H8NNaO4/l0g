@@ -1,16 +1,17 @@
 // const util = require('util');
 const chalk = require('chalk');
-const {FnMap, oftype, ofinstance, key} = require('./Map');
+const {MapFormatter, oftype, ofinstance, key} = require('./MapFormatter');
 
 chalk.enabled = true;
 chalk.level = 3;
 
-class Color extends FnMap {
+class Color extends MapFormatter {
+  static colorByType = type => v => !this.colors.type[type]?v:chalk.keyword(this.colors.type[type])(v);
   static formatMap = new Map([
     [oftype('string'), Color.compose(/*util.inspect,*/v => !this.colors.type.string?v:chalk.keyword(this.colors.type.string)(v))],
     [oftype('number'), chalk.keyword('cyan')],
     [ofinstance(Error), v => chalk.keyword('red')(v.message)],
-    [oftype('object'), Color.compose(v => v /*util.inspect(v, {colors: true})*//*,chalk.keyword('purple')*/)],
+    [Color.isObject, [Color.colorByType('object')]],
     [/warning/i, (m, r) => m.replace(r, (val) => {
       const [bg, clr] = this.colors.highlight.split('.')
       return chalk.bgKeyword(bg).keyword(clr)(val)
@@ -30,7 +31,7 @@ class Color extends FnMap {
     type: {
       string: 'lime',
       number: 'yellow',
-      object: 'white'
+      // object: 'white'
     },
     key: {
       ts: 'green',

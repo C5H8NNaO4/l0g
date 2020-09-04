@@ -1,4 +1,4 @@
-// const {FnMap} = require('./Map');
+// const {MapFormatter} = require('./Map');
 const {Formatter} = require('./Formatter');
 const {Color} = require('./Color');
 

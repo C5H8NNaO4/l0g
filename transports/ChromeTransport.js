@@ -36,7 +36,6 @@ class ChromeTransport extends ConsoleTransport {
     return options;
   }
   log (options) {
-    this.format(options);
     console.log.apply(console, options.console.args);
   }
 }

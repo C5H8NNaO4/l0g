@@ -9,10 +9,11 @@ const MapTag = (valCbs, strCbs) => (strs, ...vals) => {
   const mapVals = cbs => v => {
     let cb;
     for (const entry of cbs.entries()) {
-      const [a,b] = entry;
+      let [a,b] = entry;
+      if (!Array.isArray(b)) b = [b];
       if (typeof a !== 'function') continue;
       if (a(v)) 
-        v = b.call(this, v);
+        v = b.reduce((a, fn) => fn(a), v);
     }
 
     if (cbs.has(v)) {

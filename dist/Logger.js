@@ -2920,12 +2920,12 @@ module.exports = {Logger};
 },{"./levels":15,"./transports":43,"./util":44}],10:[function(require,module,exports){
 // const util = require('util');
 const chalk = require('chalk');
-const {FnMap, oftype, ofinstance, key} = require('./Map');
+const {MapFormatter, oftype, ofinstance, key} = require('./Map');
 
 chalk.enabled = true;
 chalk.level = 3;
 
-class Color extends FnMap {
+class Color extends MapFormatter {
   static formatMap = new Map([
     [oftype('string'), Color.compose(/*util.inspect,*/v => !this.colors.type.string?v:chalk.keyword(this.colors.type.string)(v))],
     [oftype('number'), chalk.keyword('cyan')],
@@ -3031,7 +3031,7 @@ const ofinstance = t => v => v instanceof t;
 const key = key => (v,k) => k === key;
 
 
-class FnMap extends Formatter {
+class MapFormatter extends Formatter {
   static compose = (...fns) => v => fns.flat().reduce((v, fn) => fn.call(this, v), v);
 
   constructor (fn, options = {}) {
@@ -3075,10 +3075,10 @@ class FnMap extends Formatter {
 }
 
 module.exports = {
-  FnMap, oftype, key, ofinstance,
+  MapFormatter, oftype, key, ofinstance,
 }
 },{"../tags/MapTag":38,"./Formatter":11}],13:[function(require,module,exports){
-// const {FnMap} = require('./Map');
+// const {MapFormatter} = require('./Map');
 const {Formatter} = require('./Formatter');
 const {Color} = require('./Color');
 

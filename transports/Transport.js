@@ -1,5 +1,6 @@
-const fs = require('fs');
 const {Formatter} = require('../formatters')
+const fs = require('fs');
+
 class Transport {
   constructor (options = {}) {
     const {formatter = new Formatter, features = []} = options;
@@ -8,35 +9,38 @@ class Transport {
   }
 
   log (options) {
-
     throw new Error('Not implemented');
   }
 
-  format (options) {
-    let {message} = options;
+  transform (options) {
     if (this.formatter instanceof Formatter) {
       options.message = Formatter.format(this.formatter, options);
     }
-    if (this.transform)
-      options = this.transform(options)
+    // if (this.transform)
+    //   options = this.transform(options)
     return options;
   }
 
   send (options) {
+    const currentFeatureSymbol = Transport.symbols.currentFeature;
+    options = this.transform(options);
     if (this.features) {
       for (const feat of this.features) {
-        this.currentFeature = feat;
+        this[currentFeatureSymbol] = feat;
         if (feat.log) return feat.log.call(this, options);
       }
     }
+
+    // console.log(this.transform.toString())
+
     return this.log(options);
   }
+
+  static symbols = {
+    currentFeature: Symbol('currentFeature')
+  }
 }
-
-
-
-// Transport.default = new ConsoleTransport;
-
+ 
 module.exports = {
   Transport
 }
