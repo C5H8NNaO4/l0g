@@ -1,6 +1,14 @@
 const {Transport} = require('./Transport');
 
-const _console = {...console};
+function bind(that, obj) {
+  const ret = {};
+  for (const key in obj)
+    if(typeof obj[key] === 'function')
+      ret[key] = obj[key].bind(that);
+  return ret;
+}
+const _console = bind(console, console);
+
 const swallow = key => (...args) => {
   if (ConsoleTransport.swallow === true) return;
   return _console[key].apply(console, args);
