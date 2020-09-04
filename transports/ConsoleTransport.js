@@ -1,5 +1,13 @@
 const {Transport} = require('./Transport');
 
+const _console = {...console};
+const swallow = key => (...args) => {
+  if (ConsoleTransport.swallow === true) return;
+  return _console[key].apply(console, args);
+};
+for (const key in console)
+  console[key] = swallow(key);
+
 class TransportFeature {
   constructor () {
 
@@ -35,7 +43,10 @@ class Table extends TransportFeature {
 
 class ConsoleTransport extends Transport {
   static logFns = {
-    warning: console.warn,
+    warning: _console.warn,
+    error: _console.error,
+    debug: _console.debug,
+    info: _console.info,
   };
 
   constructor(options) {
@@ -44,7 +55,7 @@ class ConsoleTransport extends Transport {
   
   log (options) {
     const {level, message} = this.format(options);
-    const logFn = ConsoleTransport.logFns[level] || console.log;
+    const logFn = ConsoleTransport.logFns[level] || _console.log;
     if (logFn)
       logFn.call(console, message);
   }
