@@ -17,7 +17,14 @@ class Logger {
     for (const level in this.levels) {
       this[level] = this.log.bind(this,level);
     }
+
+    for (const transport of this.transports) {
+      console.log('features', transport, transport.features)
+      for (const feature of transport.features)
+      feature.register.call(this, Logger);
+    }
     // return new Proxy(this, proxyHandler);
+    this.meta = {};
   }
 
   log (level, ...args) {
@@ -42,16 +49,20 @@ class Logger {
       
     }
     options.message = message;
-    gather(this, options, {level});
-    this.broadcast(options);
+    gather(this, options, {level, ...this.meta});
+    broadcast.call(this, options);
+
+    this.meta = {};
   }
 
-  broadcast (options) {
-    for (const transport of this.transports) {
-      transport.log({...options});
-    }
-  }
+
 }
+
+function broadcast (options) {
+  for (const transport of this.transports) {
+    transport.send({...options});
+  }
+};
 
 Logger.levels = levels;
 Logger.defaults = {

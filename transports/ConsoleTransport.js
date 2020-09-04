@@ -1,5 +1,37 @@
 const {Transport} = require('./Transport');
 
+class TransportFeature {
+  constructor () {
+
+  }
+  register () {
+
+  }
+}
+
+class Table extends TransportFeature {
+  register (Logger) {
+    Logger.prototype.table = Table.prototype.run;
+  }
+
+  run (data) {
+    this.meta.group = this.meta.group || {};
+    this.meta.group.table = {data};
+    return this;
+  }
+
+  log (options) {
+    if (!options.group) return this.log(options);
+    const {level, message} = this.format(options);
+    console.groupCollapsed(message)
+    // console.log(options);
+    console.table(options.group.table.data);
+    // const logFn = ConsoleTransport.logFns[level] || console.log;
+    // logFn.call(console, message);
+    console.groupEnd();
+  }
+}
+
 class ConsoleTransport extends Transport {
   static logFns = {
     warning: console.warn,
@@ -17,4 +49,5 @@ class ConsoleTransport extends Transport {
   }
 }
 
-module.exports = {ConsoleTransport};
+
+module.exports = {ConsoleTransport, Table};
