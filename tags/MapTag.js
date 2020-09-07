@@ -12,8 +12,10 @@ const MapTag = (valCbs, strCbs) => (strs, ...vals) => {
       let [a,b] = entry;
       if (!Array.isArray(b)) b = [b];
       if (typeof a !== 'function') continue;
-      if (a(v)) 
+      if (a(v)) {
         v = b.reduce((a, fn) => fn(a), v);
+        break;
+      }
     }
 
     if (cbs.has(v)) {
