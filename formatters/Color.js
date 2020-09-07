@@ -8,7 +8,7 @@ chalk.level = 3;
 class Color extends MapFormatter {
   static colorByType = type => v => !this.colors.type[type]?v:chalk.keyword(this.colors.type[type])(v);
   static formatMap = new Map([
-    [Color.isString, [v => !this.colors.type.string?v:chalk.keyword(this.colors.type.string)(v))]],
+    [Color.isString, [v => !this.colors.type.string?v:chalk.keyword(this.colors.type.string)(v)]],
     [oftype('number'), chalk.keyword('cyan')],
     [ofinstance(Error), v => chalk.keyword('red')(v.message)],
     [Color.isObject, [Color.colorByType('object')]],
