@@ -3,7 +3,7 @@ const {Transport, ConsoleTransport} = require('./transports')
 const levels = require('./levels');
 class Logger {
   constructor(level, options = {}) {
-    const {transports, gather = null, levels = Logger.defaults.levels} = options;
+    const {features, transports, gather = null, levels = Logger.defaults.levels} = options;
 
     this.level = level;
     this.levels = Logger.levels[levels];
@@ -14,8 +14,15 @@ class Logger {
     if (transports)
       this.transports = transports;
 
+    if (features)
+      this.features = features;
+
     for (const level in this.levels) {
       this[level] = this.log.bind(this,level);
+    }
+
+    for (const feature of this.features) {
+      feature.register.call(this, Logger);
     }
 
     for (const transport of this.transports) {
@@ -47,7 +54,13 @@ class Logger {
       message = null;
       
     }
+
     options.message = message;
+
+    for (const feature of this.features) {
+      // options = feature.run.call(this, options);
+    }
+
     gather(this, options, {level, ...this.meta});
     broadcast.call(this, options);
 
