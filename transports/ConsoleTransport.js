@@ -26,7 +26,10 @@ class TransportFeature {
   }
 }
 
-class Table extends TransportFeature {
+class ConsoleTransportFeature extends TransportFeature {
+  static supports = [ConsoleTransport];
+}
+class Table extends ConsoleTransportFeature {
   register (Logger) {
     Logger.prototype.table = Table.prototype.run;
   }
@@ -52,6 +55,32 @@ class Table extends TransportFeature {
   }
 }
 
+class GroupFeature extends ConsoleTransportFeature {
+  register (Logger) {
+    Logger.prototype.group = Table.prototype.start;
+    Logger.prototype.groupEnd = Table.prototype.end;
+  }
+
+  start (name) {
+    this.meta.group = this.meta.group || {};
+    this.meta.group.startGroup = true;
+  }
+
+  end () {
+    this.meta.group = this.meta.group || {};
+    this.meta.group.endGroup = true;
+  }
+
+  log (options) {
+    if (!options.group) return this.log(options);
+    const args = ConsoleTransport.getOptionalArgs(options)
+
+    ConsoleTransport.unsurpressed(() => {
+      console.groupCollapsed(...args);
+      this.log(options);
+    })   
+  }
+}
 // class Highlight extends TransportFeature {
 //   register (Logger) {
 //     Logger.prototype.table = Table.prototype.run;
@@ -100,4 +129,4 @@ class ConsoleTransport extends Transport {
 }
 
 
-module.exports = {ConsoleTransport, Table};
+module.exports = {ConsoleTransport, Table, GroupFeature};
