@@ -35,8 +35,8 @@ class Table extends ConsoleTransportFeature {
   }
 
   run (data) {
-    this.meta.group = this.meta.group || {};
-    this.meta.group.table = {data};
+    this.meta.table = this.meta.table || {};
+    this.meta.table.data = data;
     return this;
   }
 
@@ -44,12 +44,12 @@ class Table extends ConsoleTransportFeature {
     //this actually refers to the Transport instance as its being .called to give access to its functions
     //this comment might be a sign of bad code, maybe it's better to give up having the same signature for the log
     //function and pass the Transport instance as second parameter
-    if (!options.group) return this.log(options);
+    if (!options.table) return this.log(options);
     const args = ConsoleTransport.getOptionalArgs(options)
     
     ConsoleTransport.unsurpressed(() => {
       console.groupCollapsed(...args);
-      console.table(options.group.table.data);
+      console.table(options.table.data);
       console.groupEnd();
     })
   }
