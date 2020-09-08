@@ -76,8 +76,11 @@ class GroupFeature extends ConsoleTransportFeature {
     const args = ConsoleTransport.getOptionalArgs(options)
 
     ConsoleTransport.unsurpressed(() => {
-      console.groupCollapsed(...args);
+      if (options.group.startGroup)
+        console.groupCollapsed(...args);
       this.log(options);
+      if (options.group.endGroup)
+        console.groupEnd();
     })   
   }
 }
