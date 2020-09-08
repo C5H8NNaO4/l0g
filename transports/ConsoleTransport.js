@@ -57,28 +57,31 @@ class Table extends ConsoleTransportFeature {
 
 class GroupFeature extends ConsoleTransportFeature {
   register (Logger) {
-    Logger.prototype.group = Table.prototype.start;
-    Logger.prototype.groupEnd = Table.prototype.end;
+    Logger.prototype.group = GroupFeature.prototype.start;
+    Logger.prototype.groupEnd = GroupFeature.prototype.end;
   }
 
   start (name) {
     this.meta.group = this.meta.group || {};
     this.meta.group.startGroup = true;
+    return this;
   }
 
   end () {
     this.meta.group = this.meta.group || {};
     this.meta.group.endGroup = true;
+    return this;
   }
 
   log (options) {
+    const that = this;
     if (!options.group) return this.log(options);
     const args = ConsoleTransport.getOptionalArgs(options)
 
     ConsoleTransport.unsurpressed(() => {
       if (options.group.startGroup)
         console.groupCollapsed(...args);
-      this.log(options);
+      that.log(options);
       if (options.group.endGroup)
         console.groupEnd();
     })   
