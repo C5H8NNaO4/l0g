@@ -27,7 +27,7 @@ class TransportFeature {
 }
 
 class ConsoleTransportFeature extends TransportFeature {
-  static supports = [ConsoleTransport];
+  // static supports = [ConsoleTransport];
 }
 class Table extends ConsoleTransportFeature {
   register (Logger) {
