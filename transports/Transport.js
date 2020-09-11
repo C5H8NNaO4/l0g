@@ -27,7 +27,10 @@ class Transport {
     if (this.features) {
       for (const feat of this.features) {
         this[currentFeatureSymbol] = feat;
-        if (feat.log) return feat.log.call(this, options);
+        feat.transport = this;
+        let next = false;
+        if (feat.log) feat.log(options, () => next = true);
+        if (!next) return;
       }
     }
 

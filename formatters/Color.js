@@ -10,7 +10,7 @@ class Color extends MapFormatter {
   static formatMap = new Map([
     [Color.isString, [v => !this.colors.type.string?v:chalk.keyword(this.colors.type.string)(v)]],
     [oftype('number'), chalk.keyword('cyan')],
-    [ofinstance(Error), v => chalk.keyword('red')(v.message)],
+    [Color.isError, v => chalk.keyword('red')(v.message)],
     [Color.isObject, [Color.colorByType('object')]],
     [/warning/i, (m, r) => m.replace(r, (val) => {
       const [bg, clr] = this.colors.highlight.split('.')

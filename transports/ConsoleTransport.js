@@ -40,11 +40,11 @@ class Table extends ConsoleTransportFeature {
     return this;
   }
 
-  log (options) {
+  log (options, next) {
     //this actually refers to the Transport instance as its being .called to give access to its functions
     //this comment might be a sign of bad code, maybe it's better to give up having the same signature for the log
     //function and pass the Transport instance as second parameter
-    if (!options.table) return this.log(options);
+    if (!options.table) return next()
     const args = ConsoleTransport.getOptionalArgs(options)
     
     ConsoleTransport.unsurpressed(() => {
@@ -56,12 +56,19 @@ class Table extends ConsoleTransportFeature {
 }
 
 class GroupFeature extends ConsoleTransportFeature {
+  constructor(options) {
+    super(options);
+    const {level} = options;
+    this.level = level;
+    this.currentLevel = 0;
+  }
+
   register (Logger) {
     Logger.prototype.group = GroupFeature.prototype.start;
     Logger.prototype.groupEnd = GroupFeature.prototype.end;
   }
 
-  start (name) {
+  start () {
     this.meta.group = this.meta.group || {};
     this.meta.group.startGroup = true;
     return this;
@@ -73,17 +80,32 @@ class GroupFeature extends ConsoleTransportFeature {
     return this;
   }
 
-  log (options) {
-    const that = this;
-    if (!options.group) return this.log(options);
+  log (options, next) {
+    const {transport} = this;
+    if (!options.group) {
+      if (this.level >= this.currentLevel) {
+        return transport.log(options);
+      } else {
+        return
+      }
+    }
     const args = ConsoleTransport.getOptionalArgs(options)
-
     ConsoleTransport.unsurpressed(() => {
-      if (options.group.startGroup)
-        console.groupCollapsed(...args);
-      that.log(options);
-      if (options.group.endGroup)
-        console.groupEnd();
+      if (options.group.startGroup) {
+        if (this.level >= this.currentLevel) {
+          console.groupCollapsed(...args);
+          this.currentLevel++;
+        }
+      }
+      if (options.group.endGroup) {
+        this.currentLevel--;
+        console.groupEnd(...args);
+      }
+      if (!options.group.startGroup ) {
+        if (this.level >= this.currentLevel) {
+          transport.log(options);
+        }
+      } 
     })   
   }
 }
@@ -103,6 +125,7 @@ class ConsoleTransport extends Transport {
   }
   
   log (options) {
+    // _console.log ('yo', options)
     const {level} = options
     const logFn = ConsoleTransport.logFns[level] || _console.log;
     const args = ConsoleTransport.getOptionalArgs(options)

@@ -16,4 +16,8 @@ const getLine = (offset = 0) => {
   }
 }
 
-module.exports = {getLine}
+const isVisible = (cur, max, levels) => {
+  return levels[cur] <= levels[max];
+}
+
+module.exports = {getLine, isVisible};

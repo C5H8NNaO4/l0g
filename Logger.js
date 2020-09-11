@@ -1,4 +1,4 @@
-const {getLine} = require('./util');
+const {getLine, isVisible} = require('./util');
 const {Transport, ConsoleTransport} = require('./transports')
 const levels = require('./levels');
 class Logger {
@@ -26,8 +26,9 @@ class Logger {
     }
 
     for (const transport of this.transports) {
+      transport.logger = this;
       for (const feature of transport.features)
-      feature.register.call(this, Logger);
+        feature.register.call(this, Logger);
     }
     // return new Proxy(this, proxyHandler);
     this.meta = {};
@@ -39,7 +40,9 @@ class Logger {
     if (level.raw && Array.isArray(message)) {
       message = level;
     }
-    if (this.levels[level] > this.levels[this.level]) return;
+    // if (this.levels[level] > this.levels[this.level]) {
+    //   return;
+    // }
     if (level.raw && Array.isArray(args)) {
       
       options = {};
@@ -64,6 +67,7 @@ class Logger {
     gather(this, options, {level, ...this.meta});
     broadcast.call(this, options);
 
+    // process.stdout.write('Resetting meta')
     this.meta = {};
   }
 
@@ -71,6 +75,7 @@ class Logger {
 }
 
 function broadcast (options) {
+  if (!isVisible(options.level, this.level, this.levels)) return;
   for (const transport of this.transports) {
     transport.send({...options});
   }
