@@ -2851,7 +2851,6 @@ class Logger {
     }
 
     for (const transport of this.transports) {
-      console.log('features', transport, transport.features)
       for (const feature of transport.features)
       feature.register.call(this, Logger);
     }
@@ -2920,17 +2919,18 @@ module.exports = {Logger};
 },{"./levels":15,"./transports":43,"./util":44}],10:[function(require,module,exports){
 // const util = require('util');
 const chalk = require('chalk');
-const {MapFormatter, oftype, ofinstance, key} = require('./Map');
+const {MapFormatter, oftype, ofinstance, key} = require('./MapFormatter');
 
 chalk.enabled = true;
 chalk.level = 3;
 
 class Color extends MapFormatter {
+  static colorByType = type => v => !this.colors.type[type]?v:chalk.keyword(this.colors.type[type])(v);
   static formatMap = new Map([
     [oftype('string'), Color.compose(/*util.inspect,*/v => !this.colors.type.string?v:chalk.keyword(this.colors.type.string)(v))],
     [oftype('number'), chalk.keyword('cyan')],
     [ofinstance(Error), v => chalk.keyword('red')(v.message)],
-    [oftype('object'), Color.compose(v => v /*util.inspect(v, {colors: true})*//*,chalk.keyword('purple')*/)],
+    [Color.isObject, [Color.colorByType('object')]],
     [/warning/i, (m, r) => m.replace(r, (val) => {
       const [bg, clr] = this.colors.highlight.split('.')
       return chalk.bgKeyword(bg).keyword(clr)(val)
@@ -2950,7 +2950,7 @@ class Color extends MapFormatter {
     type: {
       string: 'lime',
       number: 'yellow',
-      object: 'white'
+      // object: 'white'
     },
     key: {
       ts: 'green',
@@ -2974,7 +2974,7 @@ class Color extends MapFormatter {
 }
 
 module.exports = {Color};
-},{"./Map":12,"chalk":46}],11:[function(require,module,exports){
+},{"./MapFormatter":12,"chalk":46}],11:[function(require,module,exports){
 const {tag} = require('../tags/tag');
 const moment = require('moment')
 const util = require('util')
@@ -2984,12 +2984,22 @@ class Formatter {
       this._format = fn;
   }
 
+  transformTagArgs (...args) {
+    return args;
+  }
+
   transform (options) {
+    if (Array.isArray(options.tag) && options.tag[0].raw) {
+      options.tag = this.transformTagArgs(...options.tag);
+      options.message = this.tag(...options.tag);
+    }
+    
     options.ts = this.constructor.timestamp(options.ts);
+
     return options;
   }
 
-  format ( options) {
+  format (options) {
     const {ts, level, message} = options;
     if (this._format)
       return this._format(options);
@@ -3000,21 +3010,21 @@ class Formatter {
     return moment(ts).toISOString();
   }
 
-  static transform (instance, options) {
-    // if (typeof instance.transformTag === 'function')
-    //   options.tag = 
-    if (Array.isArray(options.tag) && options.tag[0].raw)
-      options.message = instance.tag(...options.tag);
+  // static transform (instance, options) {
+  //   // if (typeof instance.transformTag === 'function')
+  //   //   options.tag = 
+  //   if (Array.isArray(options.tag) && options.tag[0].raw)
+  //     options.message = instance.tag(...options.tag);
 
-    if (typeof instance.transform === 'function')
-      options = instance.transform(options);
+  //   if (typeof instance.transform === 'function')
+  //     options = instance.transform(options);
 
 
-    return options;
-  }
+  //   return options;
+  // }
 
   static format (instance, options) {
-    options = Formatter.transform(instance, options);
+    options = instance.transform(options) //Formatter.transform(instance, options);
     return instance.format(options);
   }
 }
@@ -3032,6 +3042,7 @@ const key = key => (v,k) => k === key;
 
 
 class MapFormatter extends Formatter {
+  static isObject = oftype('object');
   static compose = (...fns) => v => fns.flat().reduce((v, fn) => fn.call(this, v), v);
 
   constructor (fn, options = {}) {
@@ -3062,15 +3073,13 @@ class MapFormatter extends Formatter {
   }
 
   transform (options) {
-    // options.ts = this.constructor.timestamp(options.ts);
     options = super.transform(options)
-    // options = colorize(options, colors);
     options = this.transformOptions(options);
     return options;
   }
 
   tag (strs, ...vals) {
-    return MapTag(this.formatMap, this.strFormatMap).call(this,strs, ...vals)
+    return MapTag(this.formatMap, this.strFormatMap).call(this, strs, ...vals)
   }
 }
 
@@ -3096,8 +3105,7 @@ const exprts = {
   formatters,
 };
 
-console.log ("Init", exprts)
-if (window)
+if (typeof window !== 'undefined')
   window.clog = exprts;
 
 module.exports = exprts;
@@ -7553,10 +7561,11 @@ const MapTag = (valCbs, strCbs) => (strs, ...vals) => {
   const mapVals = cbs => v => {
     let cb;
     for (const entry of cbs.entries()) {
-      const [a,b] = entry;
+      let [a,b] = entry;
+      if (!Array.isArray(b)) b = [b];
       if (typeof a !== 'function') continue;
       if (a(v)) 
-        v = b.call(this, v);
+        v = b.reduce((a, fn) => fn(a), v);
     }
 
     if (cbs.has(v)) {
@@ -7632,7 +7641,6 @@ class ChromeTransport extends ConsoleTransport {
     return options;
   }
   log (options) {
-    this.format(options);
     console.log.apply(console, options.console.args);
   }
 }
@@ -7642,6 +7650,23 @@ module.exports = {
 }
 },{"./ConsoleTransport":41,"ansi_up":18}],41:[function(require,module,exports){
 const {Transport} = require('./Transport');
+
+function bind(that, obj) {
+  const ret = {};
+  for (const key in obj)
+    if(typeof obj[key] === 'function')
+      ret[key] = obj[key].bind(that);
+  return ret;
+}
+const _console = bind(console, console);
+
+const supress = key => (...args) => {
+  if (ConsoleTransport.supress === true) return;
+  return _console[key].apply(console, args);
+};
+
+for (const key in console)
+  console[key] = supress(key);
 
 class TransportFeature {
   constructor () {
@@ -7664,40 +7689,73 @@ class Table extends TransportFeature {
   }
 
   log (options) {
+    //this actually refers to the Transport instance as its being .called to give access to its functions
+    //this comment might be a sign of bad code, maybe it's better to give up having the same signature for the log
+    //function and pass the Transport instance as second parameter
     if (!options.group) return this.log(options);
-    const {level, message} = this.format(options);
-    const {args = [message]} = options.console || {};
-    console.groupCollapsed(...args);
-    // console.log(options);
-    console.table(options.group.table.data);
-    // const logFn = ConsoleTransport.logFns[level] || console.log;
-    // logFn.call(console, message);
-    console.groupEnd();
+    const args = ConsoleTransport.getOptionalArgs(options)
+    
+    ConsoleTransport.unsurpressed(() => {
+      console.groupCollapsed(...args);
+      console.table(options.group.table.data);
+      console.groupEnd();
+    })
   }
 }
 
-class ConsoleTransport extends Transport {
-  static logFns = {
-    warning: console.warn,
-  };
+// class Highlight extends TransportFeature {
+//   register (Logger) {
+//     Logger.prototype.table = Table.prototype.run;
+//   }
 
+//   run (data) {
+//     this.formatter.formatMap.set(data, v => )
+//     return this;
+//   }
+// }
+class ConsoleTransport extends Transport {
   constructor(options) {
     super(options)
   }
   
   log (options) {
-    const {level, message} = this.format(options);
-    const logFn = ConsoleTransport.logFns[level] || console.log;
+    const {level} = options
+    const logFn = ConsoleTransport.logFns[level] || _console.log;
+    const args = ConsoleTransport.getOptionalArgs(options)
     if (logFn)
-      logFn.call(console, message);
+      logFn.apply(console, args);
+  }
+
+  static logFns = {
+    warning: _console.warn,
+    error: _console.error,
+    debug: _console.debug,
+    info: _console.info,
+  };
+
+  static supress = false;
+
+  //Overriding console.log breaks console.table on node.js. This doesn't happen in the browser. If some code needs to use console.table, they can use this function.
+  static unsurpressed = fn => {
+    const {supress} = ConsoleTransport;
+    ConsoleTransport.supress = false;
+    fn();
+    ConsoleTransport.supress = supress;
+  }
+
+  static getOptionalArgs = options => {
+    const {console = {}, message} = options;
+    const {args = [message]} = console;
+    return args;
   }
 }
 
 
 module.exports = {ConsoleTransport, Table};
 },{"./Transport":42}],42:[function(require,module,exports){
-const fs = require('fs');
 const {Formatter} = require('../formatters')
+const fs = require('fs');
+
 class Transport {
   constructor (options = {}) {
     const {formatter = new Formatter, features = []} = options;
@@ -7706,35 +7764,38 @@ class Transport {
   }
 
   log (options) {
-
     throw new Error('Not implemented');
   }
 
-  format (options) {
-    let {message} = options;
+  transform (options) {
     if (this.formatter instanceof Formatter) {
       options.message = Formatter.format(this.formatter, options);
     }
-    if (this.transform)
-      options = this.transform(options)
+    // if (this.transform)
+    //   options = this.transform(options)
     return options;
   }
 
   send (options) {
+    const currentFeatureSymbol = Transport.symbols.currentFeature;
+    options = this.transform(options);
     if (this.features) {
       for (const feat of this.features) {
-        this.currentFeature = feat;
+        this[currentFeatureSymbol] = feat;
         if (feat.log) return feat.log.call(this, options);
       }
     }
+
+    // console.log(this.transform.toString())
+
     return this.log(options);
   }
+
+  static symbols = {
+    currentFeature: Symbol('currentFeature')
+  }
 }
-
-
-
-// Transport.default = new ConsoleTransport;
-
+ 
 module.exports = {
   Transport
 }

@@ -9,6 +9,7 @@ const key = key => (v,k) => k === key;
 class MapFormatter extends Formatter {
   static isObject = oftype('object');
   static isError = ofinstance(Error);
+  static isString = oftype('string');
   
   static compose = (...fns) => v => fns.flat().reduce((v, fn) => fn.call(this, v), v);
 
