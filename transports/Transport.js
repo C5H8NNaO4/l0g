@@ -1,18 +1,38 @@
-const {Formatter} = require('../formatters')
+const {Formatter} = require('../formatters');
 const fs = require('fs');
 
+/**
+ * @typedef TransportOptions
+ * @type {Object}
+ * @property {Formatter} [formatter=new Formatter] - The formatter, the transport uses.
+ * @property {Feature[]} features - The features used by the transport
+ */
+
+/**
+ * Transport class
+ * @description A transport is used to *transport* log messages to various locations. Like a file or the console.
+ */
 class Transport {
-  constructor (options = {}) {
+
+  /**
+   * 
+   * @param {TransportOptions} options - Optional options
+   */
+  constructor(options = {}) {
     const {formatter = new Formatter, features = []} = options;
     this.formatter = formatter;
     this.features = features;
   }
 
-  log (options) {
+  /**
+   * @description The Transport.log function gets called on behalf the Logger.
+   * @param {LogOptions} options - The metadata passed to Logger.log
+   */
+  log(options) {
     throw new Error('Not implemented');
   }
 
-  transform (options) {
+  transform(options) {
     if (this.formatter instanceof Formatter) {
       options.message = Formatter.format(this.formatter, options);
     }
@@ -21,7 +41,7 @@ class Transport {
     return options;
   }
 
-  send (options) {
+  send(options) {
     const currentFeatureSymbol = Transport.symbols.currentFeature;
     options = this.transform(options);
     if (this.features) {
@@ -37,10 +57,10 @@ class Transport {
   }
 
   static symbols = {
-    currentFeature: Symbol('currentFeature')
+    currentFeature: Symbol('currentFeature'),
   }
 }
- 
+
 module.exports = {
-  Transport
-}
+  Transport,
+};

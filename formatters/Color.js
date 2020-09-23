@@ -3,14 +3,14 @@ const chalk = require('chalk');
 const {MapFormatter, oftype, ofinstance, key} = require('./MapFormatter');
 
 chalk.enabled = true;
-chalk.level = 3;
+chalk.level = 1;
 
 class Color extends MapFormatter {
   static colorByType = type => v => !this.colors.type[type]?v:chalk.keyword(this.colors.type[type])(v);
   static formatMap = new Map([
     [oftype('string'), Color.compose(/*util.inspect,*/v => !this.colors.type.string?v:chalk.keyword(this.colors.type.string)(v))],
     [oftype('number'), chalk.keyword('cyan')],
-    [ofinstance(Error), v => chalk.keyword('red')(v.message)],
+    [Color.isError, v => chalk.keyword('red')(v.message)],
     [Color.isObject, [Color.colorByType('object')]],
     [/warning/i, (m, r) => m.replace(r, (val) => {
       const [bg, clr] = this.colors.highlight.split('.')

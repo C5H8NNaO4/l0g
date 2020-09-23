@@ -14,8 +14,6 @@ const supress = key => (...args) => {
   return _console[key].apply(console, args);
 };
 
-for (const key in console)
-  console[key] = supress(key);
 
 class TransportFeature {
   constructor () {
@@ -69,20 +67,24 @@ class ConsoleTransport extends Transport {
   
   log (options) {
     const {level} = options
-    const logFn = ConsoleTransport.logFns[level] || _console.log;
+    const logFn = ConsoleTransport.logFns[level] || "log";
     const args = ConsoleTransport.getOptionalArgs(options)
     if (logFn)
-      logFn.apply(console, args);
+      console[logFn](...args);
   }
 
   static logFns = {
-    warning: _console.warn,
-    error: _console.error,
-    debug: _console.debug,
-    info: _console.info,
+    warning: "warn",
+    error: "error",
+    debug: "debug",
+    info: "info",
   };
 
-  static supress = false;
+  static supressed = false;
+  static surpress = () => {
+    for (const key in console)
+      console[key] = supress(key);
+  }
 
   //Overriding console.log breaks console.table on node.js. This doesn't happen in the browser. If some code needs to use console.table, they can use this function.
   static unsurpressed = fn => {

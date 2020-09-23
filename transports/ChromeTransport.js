@@ -28,8 +28,8 @@ function getStyledConsoleLogArgs(message = '', ...args) {
     }
 
     // pass through subsequent args since chrome dev tools does
-    // not (yet) support console.log styling of the following 
-    // form: 
+    // not (yet) support console.log styling of the following
+    // form:
     // console.log('%cBlue!', 'color: blue;', '%cRed!', 'color: red;');
     for (const arg of args) {
       argArray.push(arg);
@@ -48,7 +48,7 @@ function getStyledConsoleLogArgs(message = '', ...args) {
  * @property {any} * - any
  */
 
- /**
+/**
  * @typedef Person
  * @type {Object}
  * @property {number} age - the person's age

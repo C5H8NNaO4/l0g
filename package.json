@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "bundle": "browserify index.js --standalone clog -o dist/Logger.js"
+    "bundle": "browserify index.js --standalone clog -o dist/Logger.js",
+    "build:docs": "jsdoc -c jsdoc.conf.json -r --verbose ./",
+    "watch": "npm-watch"
   },
   "keywords": [
     "log"
@@ -13,6 +15,7 @@
   "author": "moritz.roessler@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "@types/jest": "^26.0.13",
     "ansi_up": "^4.0.4",
     "chalk": "^4.1.0",
     "moment": "^2.27.0",
@@ -20,5 +23,15 @@
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "stacktracey": "^2.0.14"
+  },
+  "watch": {
+    "build:docs": "*.js"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.8.1",
+    "eslint-config-google": "^0.14.0",
+    "jest": "^26.4.2",
+    "npm-watch": "^0.7.0"
   }
 }
