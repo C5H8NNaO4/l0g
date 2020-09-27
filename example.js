@@ -19,7 +19,6 @@ const logger = new Logger('debug', {transports});
 // ConsoleTransport.supress = true;
 
 const util = require('util');
-console.log(util.inspect(logger));
 logger.table(transports).log`Test`;
 logger.log`Hey ${'asd'} ${1234} ${{foo: 'bar'}}`;
 // logger.transports[0].formatter.formatMap.get(Color.isObject).unshift(v => util.inspect(v, false, 12, true));

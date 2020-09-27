@@ -10,6 +10,7 @@ class MapFormatter extends Formatter {
   static isObject = oftype('object');
   static isError = ofinstance(Error);
   static isString = oftype('string');
+  static isError = ofinstance(Error);
   
   static compose = (...fns) => v => fns.flat().reduce((v, fn) => fn.call(this, v), v);
 

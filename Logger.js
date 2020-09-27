@@ -1,5 +1,5 @@
-const {getLine} = require('./util');
-const {ConsoleTransport} = require('./transports');
+const {getLine, isVisible} = require('./util');
+const {Transport, ConsoleTransport} = require('./transports')
 const levels = require('./levels');
 
 /**
@@ -32,7 +32,7 @@ class Logger {
    * @param {LoggerOptions} [options=Logger.defaults.options] - Optional options. 
    */
   constructor(level = Logger.defaults.level, options = {}) {
-    const {transports, gather = null, levels = Logger.defaults.options.levels} = options;
+    const {transports, gather = null, levels = Logger.defaults.options.levels, features = []} = options;
 
     /**
      * The log level of the logger.
@@ -55,28 +55,39 @@ class Logger {
       this.transports = transports;
     }
 
+    if (features)
+      this.features = features;
+
     for (const level in this.levels) {
       if (this.levels.hasOwnProperty(level)) {
-        this[level] = this.log.bind(this, level);
+        this[level] = (...args) => this.setLevel(level).log(...args);
       }
     }
 
+    for (const feature of this.features) {
+      feature.register.call(this, Logger);
+    }
+
     for (const transport of this.transports) {
-      for (const feature of transport.features) {
+      transport.logger = this;
+      for (const feature of transport.features)
         feature.register.call(this, Logger);
-      }
     }
     // return new Proxy(this, proxyHandler);
     this.meta = {};
   }
 
+  setLevel(level) {
+    this.meta.level = level;
+    return this;
+  }
   /**
    * 
    * @param {*} level 
    * @param  {...any} args 
    */
   log(message, ...args) {
-    let [options] = args, level;
+    let [options = {}] = args, level;
     // if (message.raw && Array.isArray(options)) {
     //   message = level;
     // }
@@ -91,10 +102,16 @@ class Logger {
       options.message = message;
     }
 
-    
+    options.message = message;
+
+    for (const feature of this.features) {
+      // options = feature.run.call(this, options);
+    }
+
     gather(this, options, {level, ...this.meta});
     broadcast(this, options);
 
+    // process.stdout.write('Resetting meta')
     this.meta = {};
   }
 }
@@ -104,7 +121,8 @@ class Logger {
  * @param {Logger} instance - The logger instance.
  * @param {MessageOptions} options - The options passed to the transports
  */
-function broadcast(instance, options) {
+function broadcast (instance, options) {
+  if (!isVisible(options.level || 'info', instance.level, instance.levels)) return;
   for (const transport of instance.transports) {
     transport.send({...options});
   }
