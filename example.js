@@ -7,6 +7,14 @@ const {FileTransport}= require('./transports/FileTransport')
 const {Color} = require('./formatters/Color');
 const {Inspect} = require('./formatters/Inspect');
 
+const {ReloadConfigFeature} = require('./features/LogLevelFeature.js');
+
+const reloadConfigFeature = new ReloadConfigFeature();
+
+const features = [
+  reloadConfigFeature
+];
+
 const transports = [
   new ConsoleTransport({formatter: new Color, features:[
     new Table
@@ -14,7 +22,8 @@ const transports = [
   new FileTransport('test.log', {formatter: new Inspect}),
   // new PostgresTransport('psql://postgres:password@localhost/kruch')
 ]
-const logger = new Logger('debug', {transports});
+
+const logger = new Logger('debug', {transports, features});
 
 // ConsoleTransport.supress = true;
 

@@ -3,7 +3,7 @@ const {Transport, ConsoleTransport} = require('./transports')
 const levels = require('./levels');
 class Logger {
   constructor(level, options = {}) {
-    const {features, transports, gather = null, levels = Logger.defaults.levels} = options;
+    const {features = [], transports, gather = null, levels = Logger.defaults.levels} = options;
 
     this.level = level;
     this.levels = Logger.levels[levels];
@@ -22,7 +22,7 @@ class Logger {
     }
 
     for (const feature of this.features) {
-      feature.register.call(this, Logger);
+      feature.register(Logger, this);
     }
 
     for (const transport of this.transports) {

@@ -2921,8 +2921,8 @@ module.exports = {Logger};
 const chalk = require('chalk');
 const {MapFormatter, oftype, ofinstance, key} = require('./MapFormatter');
 
-chalk.enabled = true;
-chalk.level = 3;
+// chalk.enabled = true;
+chalk.level = 1;
 
 class Color extends MapFormatter {
   static colorByType = type => v => !this.colors.type[type]?v:chalk.keyword(this.colors.type[type])(v);
