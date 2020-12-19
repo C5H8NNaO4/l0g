@@ -1,5 +1,5 @@
 {
-  "name": "log",
+  "name": "l0g",
   "version": "0.0.1",
   "description": "A simple Logger featuring transports and formatters.",
   "main": "index.js",
