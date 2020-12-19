@@ -10,6 +10,6 @@ const exprts = {
 };
 
 if (typeof window !== 'undefined')
-  window.clog = exprts;
+  window.l0g = exprts;
 
 module.exports = exprts;

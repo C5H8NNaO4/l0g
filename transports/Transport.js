@@ -33,8 +33,9 @@ class Transport {
   }
 
   transform(options) {
+    this.logger.context.transport = this;
     if (this.formatter instanceof Formatter) {
-      options.message = Formatter.format(this.formatter, options);
+      options.message = Formatter.format(this.formatter, {transport:this, ...options});
     }
     // if (this.transform)
     //   options = this.transform(options)

@@ -1,19 +1,24 @@
 const {tag} = require('../tags/tag');
 const moment = require('moment')
-const util = require('util')
+const util = require('util');
+const { Format } = require('../symbols');
+
 class Formatter {
   constructor (fn) {
     if (typeof fn === 'function')
       this._format = fn;
   }
 
-  transformTagArgs (...args) {
-    return args;
+  transformTagArgs (options, ...args) {
+    return args.map((obj) => {
+      if (obj && obj[Format]) return obj[Format]({formatter: this, ...options});
+      return obj;
+    });
   }
 
   transform (options) {
     if (Array.isArray(options.tag) && options.tag[0].raw) {
-      options.tag = this.transformTagArgs(...options.tag);
+      options.tag = this.transformTagArgs(options, ...options.tag);
       options.message = this.tag(...options.tag);
     }
     
