@@ -10,7 +10,10 @@ function bind(that, obj) {
 const _console = bind(console, console);
 
 const supress = key => (...args) => {
-  if (ConsoleTransport.supress === true) return;
+  const err = new Error;
+  _console.warn (`console.${key} called from ${err.stack.split('\n')[2]}`)
+
+  if (ConsoleTransport.surpressed === true) return;
   return _console[key].apply(console, args);
 };
 
@@ -40,7 +43,7 @@ class Table extends ConsoleTransportFeature {
 
   log (options, next) {
     //this actually refers to the Transport instance as its being .called to give access to its functions
-    //this comment might be a sign of bad code, maybe it's better to give up having the same signature for the log
+    //maybe it's better to give up having the same signature for the log
     //function and pass the Transport instance as second parameter
     if (!options.table) return next()
     const args = ConsoleTransport.getOptionalArgs(options)
@@ -128,7 +131,7 @@ class ConsoleTransport extends Transport {
     const logFn = ConsoleTransport.logFns[level] || "log";
     const args = ConsoleTransport.getOptionalArgs(options)
     if (logFn)
-      console[logFn](...args);
+      _console[logFn](...args);
   }
 
   static logFns = {
@@ -138,10 +141,11 @@ class ConsoleTransport extends Transport {
     info: "info",
   };
 
-  static supressed = false;
+  static surpressed = false;
   static surpress = () => {
     for (const key in console)
       console[key] = supress(key);
+    _console.log("Console blocked")
   }
 
   //Overriding console.log breaks console.table on node.js. This doesn't happen in the browser. If some code needs to use console.table, they can use this function.

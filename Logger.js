@@ -32,7 +32,7 @@ class Logger {
    * @param {LoggerOptions} [options=Logger.defaults.options] - Optional options. 
    */
   constructor(level = Logger.defaults.level, options = {}) {
-    const {transports, gather = null, levels = Logger.defaults.options.levels, features = []} = options;
+    const {transports, gather = null, levels = Logger.defaults.options.levels, features = [], extra = {}} = options;
 
     /**
      * The log level of the logger.
@@ -74,7 +74,8 @@ class Logger {
         feature.register.call(this, Logger);
     }
     // return new Proxy(this, proxyHandler);
-    this.meta = {};
+    this.meta = {...extra};
+    this.options = options;
   }
 
   setLevel(level) {
@@ -88,17 +89,13 @@ class Logger {
    */
   log(message, ...args) {
     let [options = {}] = args, level;
-    // if (message.raw && Array.isArray(options)) {
-    //   message = level;
-    // }
-    // if (this.levels[level] > this.levels[this.level]) return;
+   
     if (message.raw && Array.isArray(args)) {
       options = {};
       options.tag = [message, ...args];
       message = null;
       level = 'info';
     } else {
-      console.log("A", message, args)
       options.message = message;
     }
 
@@ -109,11 +106,29 @@ class Logger {
     }
 
     gather(this, options, {level, ...this.meta});
+
+    if (process.env.LOG_SCOPE)
+      Logger.scope = new RegExp(process.env.LOG_SCOPE);
+      
+    if (options.scope && Logger.scope instanceof RegExp && !Logger.scope.test(options.scope))
+      return;
+
     broadcast(this, options);
 
     // process.stdout.write('Resetting meta')
-    this.meta = {};
+    this.meta = {...this.extra};
   }
+
+  /**
+   * Returns a new Logger instance with the key set as its scope.
+   * @param {string} key - The handle of the scope.
+   */
+  scope (key) {
+    const scoped = new Logger(this.level, {...this.options, extra: {...this.extra, scope: key}});
+    return scoped;
+  }
+
+  static scope = (/.*/);
 }
 
 /**
@@ -139,6 +154,7 @@ Logger.defaults = {
 Logger.prototype[Symbol.toStringTag] = 'Hi';
 Logger.prototype.transports = [new ConsoleTransport];
 Logger.prototype.gather = {
+  scope: () => '*',
   ts: () => +new Date,
   loc: () => getLine(3),
 };

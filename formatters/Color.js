@@ -24,6 +24,7 @@ class Color extends MapFormatter {
 
   static optionsMap = new Map([
     [key('ts'), Color.compose(v => chalk.keyword(this.colors.key.ts)(v))],
+    [key('scope'), Color.compose(v => chalk.keyword(this.colors.key.scope)(v))],
     [key('level'), v => !this.colors.key.level[v]?v:chalk.keyword(this.colors.key.level[v]||this.colors.default)(v)],
   ]);
 
@@ -34,6 +35,7 @@ class Color extends MapFormatter {
       // object: 'white'
     },
     key: {
+      scope: 'blue',
       ts: 'green',
       level: {
         info: 'green',
