@@ -25,6 +25,8 @@ const levels = require('./levels');
  * @type {Logger}
  * @property {string} level - Static
  */
+
+
 class Logger {
   /**
    * Logger constructor
@@ -65,7 +67,7 @@ class Logger {
     }
 
     for (const feature of this.features) {
-      feature.register.call(this, Logger);
+      feature.register(Logger, this);
     }
 
     for (const transport of this.transports) {
@@ -74,8 +76,9 @@ class Logger {
         feature.register.call(this, Logger);
     }
     // return new Proxy(this, proxyHandler);
-    this.meta = {...extra};
     this.options = options;
+    this.context = {};
+    this.meta = {...extra};
   }
 
   setLevel(level) {
