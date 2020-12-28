@@ -1,7 +1,7 @@
 const {Formatter} = require('./Formatter')
 const util = require('util');
 class Inspect extends Formatter {
-  transformTagArgs (strs, ...vals) {
+  transformTagArgs (options, strs, ...vals) {
     return [strs, ...vals.map(val => util.inspect(val))]
   }
   // transform (options) {
