@@ -76,6 +76,7 @@ class Logger {
         feature.register.call(this, Logger);
     }
     // return new Proxy(this, proxyHandler);
+    this.extra = extra;
     this.options = options;
     this.context = {};
     this.meta = {...extra};
