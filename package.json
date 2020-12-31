@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "bundle": "browserify index.js --standalone clog -o dist/Logger.js",
+    "bundle": "browserify index.js --standalone l0g -o dist/Logger.js",
     "build:docs": "jsdoc -c jsdoc.conf.json -r --verbose ./",
     "watch": "npm-watch"
   },
@@ -15,10 +15,14 @@
   "author": "moritz.roessler@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "@babel/node": "^7.12.10",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
     "@types/jest": "^26.0.13",
     "ansi_up": "^4.0.4",
     "chalk": "^4.1.0",
-    "moment": "^2.27.0",
+    "chokidar": "^3.4.3",
+    "dotenv": "^8.2.0",
+    "moment": "^2.29.1",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-node-resolve": "^5.2.0",
@@ -28,7 +32,10 @@
     "build:docs": "*.js"
   },
   "devDependencies": {
+    "@babel/cli": "^7.12.10",
+    "@babel/core": "^7.12.10",
     "babel-eslint": "^10.1.0",
+    "babelify": "^10.0.0",
     "eslint": "^7.8.1",
     "eslint-config-google": "^0.14.0",
     "jest": "^26.4.2",

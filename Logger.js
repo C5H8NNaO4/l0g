@@ -1,6 +1,7 @@
 const {getLine, isVisible} = require('./util');
 const {Transport, ConsoleTransport} = require('./transports')
 const levels = require('./levels');
+const {LOG_LEVEL, LOG_SCOPE, LOG_FILTER} = require('./config');
 
 /**
  * @typedef {"npm" | "rfc5424"} LogLevelSet
@@ -40,7 +41,7 @@ class Logger {
      * The log level of the logger.
      * @type {string}
      */
-    this.level = level;
+    this.level = LOG_LEVEL || level;
 
     /**
      * The log level set used by the logger. See l0g/levels/*
@@ -62,12 +63,18 @@ class Logger {
 
     for (const level in this.levels) {
       if (this.levels.hasOwnProperty(level)) {
-        this[level] = (...args) => this.setLevel(level).log(...args);
+        this[level] = (...args) => this.setMessageLevel(level).log(...args);
       }
     }
 
     for (const feature of this.features) {
-      feature.register(Logger, this);
+      if (!extra.scope) {
+        Logger.base = this;
+        feature.register(Logger, this);
+        setTimeout(() => {
+          feature.init(this);
+        }, 0);
+      }
     }
 
     for (const transport of this.transports) {
@@ -76,14 +83,59 @@ class Logger {
         feature.register.call(this, Logger);
     }
     // return new Proxy(this, proxyHandler);
+    
+    if (LOG_SCOPE) {
+      Logger.scope = new RegExp(process.env.LOG_SCOPE);
+      !extra.scope && setTimeout(() => {
+        this.info`Using LOG_SCOPE from environment. ${LOG_SCOPE}`
+      }, 0)
+    }
+      
+    if (LOG_FILTER) {
+      Logger.filter = new RegExp(process.env.LOG_FILTER);
+      !extra.scope && setTimeout(() => {
+        this.info`Using LOG_FILTER from environment. ${LOG_FILTER}`
+      }, 0)
+    }
+
+    if (LOG_LEVEL) {
+      !extra.scope && setTimeout(() => {
+
+        this.info`Using LOG_LEVEL from environment. ${LOG_LEVEL}`
+      },0);
+      // this.level = LOG_LEVEL;
+    }
+
+    this.scopes = new Map;
     this.extra = extra;
     this.options = options;
     this.context = {};
-    this.meta = {...extra};
+    this.meta = {...extra, loggerLevel: this.level};
   }
 
-  setLevel(level) {
+  addTransport (transport) {
+    transport.logger = this;
+    for (const feature of transport.features)
+      feature.register.call(this, Logger);
+    
+    this.transports.push(transport)
+  }
+  setMessageLevel(level) {
     this.meta.level = level;
+    return this;
+  }
+
+  setNextLevel (level) {
+    this.meta.loggerLevel = level;
+    return this;
+  }
+
+  setLevel (level) {
+    this.level = level;
+    this.scopes.forEach((logger) => {
+      process.stdout.write("Setting level for logger " + logger.extra.scope + '\n')
+      logger.setLevel(level);
+    })
     return this;
   }
   /**
@@ -111,16 +163,16 @@ class Logger {
 
     gather(this, options, {level, ...this.meta});
 
-    if (process.env.LOG_SCOPE)
-      Logger.scope = new RegExp(process.env.LOG_SCOPE);
-      
     if (options.scope && Logger.scope instanceof RegExp && !Logger.scope.test(options.scope))
       return;
+    
+    if (Logger.filter && Logger.filter instanceof RegExp && !Logger.filter.test(options.message))
+      return
 
     broadcast(this, options);
 
     // process.stdout.write('Resetting meta')
-    this.meta = {...this.extra};
+    this.meta = {...this.extra, loggerLevel: this.level};
   }
 
   /**
@@ -128,20 +180,28 @@ class Logger {
    * @param {string} key - The handle of the scope.
    */
   scope (key) {
-    const scoped = new Logger(this.level, {...this.options, extra: {...this.extra, scope: key}});
+    const nextScope = [this.extra.scope,key].filter(Boolean).join('.');
+    if (this.scopes.has(nextScope))
+      return this.scopes.get(nextScope);
+    const scoped = new Logger(this.level, {...this.options, extra: {...this.extra, scope: nextScope}});
+    this.scopes.set(nextScope,scoped);
     return scoped;
   }
 
-  static scope = (/.*/);
 }
 
+Logger.scope = (/.*/);
+Logger.write = (...msg) => {
+  process.stdout.write(msg.join(' ') + '\n');
+}
 /**
  * Private method to broadcast a message to the transports.
  * @param {Logger} instance - The logger instance.
  * @param {MessageOptions} options - The options passed to the transports
  */
 function broadcast (instance, options) {
-  if (!isVisible(options.level || 'info', instance.level, instance.levels)) return;
+  // process.stdout.write(instance.level + ' ' + instance.meta.level + '\n')
+  if (!isVisible(options.level || 'info', instance.meta.loggerLevel, instance.levels)) return;
   for (const transport of instance.transports) {
     transport.send({...options});
   }
