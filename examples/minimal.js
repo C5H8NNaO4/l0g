@@ -1,3 +1,1 @@
-const {logger} = require('../instance');
-
-logger.log`Hello World!`;
+module.exports = require('./../src/examples/minimal.js')

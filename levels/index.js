@@ -1,4 +1,1 @@
-module.exports = {
-  npm: require('./npm'),
-  rfc5424: require('./rfc5424'),
-}
+module.exports = require('./../src/levels/index.js')

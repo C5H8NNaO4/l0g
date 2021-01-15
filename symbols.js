@@ -1,3 +1,1 @@
-const Format = Symbol.for('l0g.format');
-
-module.exports = {Format};
+module.exports = require('./src/symbols.js')

@@ -1,0 +1,1 @@
+module.exports = require('./../src/formatters/_MapFormatter.js')

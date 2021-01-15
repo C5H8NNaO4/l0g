@@ -1,9 +1,1 @@
-const Tag = (strs, ...vals) => {
-  return strs.reduce((str, val, i) => {
-    return str + vals[i-1] + val;
-  })
-}
-
-module.exports = {
-  Tag
-}
+module.exports = require('./../src/tags/index.js')

@@ -1,0 +1,7 @@
+{
+    "sourceFileName": "./index.js",
+    "plugins": ["@babel/plugin-proposal-class-properties"],
+    "ignore": [
+        "built"
+      ]
+}

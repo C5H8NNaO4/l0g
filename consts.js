@@ -1,5 +1,1 @@
-const STR_MASK_PASS = '***'
-
-module.exports = {
-  STR_MASK_PASS
-}
+module.exports = require('./src/consts.js')

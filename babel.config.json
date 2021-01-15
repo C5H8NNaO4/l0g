@@ -1,0 +1,11 @@
+{
+    "babelrcRoots": [
+    ".",
+    "formatters/Color/*"
+  ],
+  "ignore": [
+    "dist",
+    "built",
+    "node_modules"
+   ]
+}

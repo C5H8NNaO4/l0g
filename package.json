@@ -2,10 +2,10 @@
   "name": "l0g",
   "version": "0.0.1",
   "description": "A simple Logger featuring transports and formatters.",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "jest",
-    "bundle": "browserify index.js --standalone l0g -o dist/Logger.js",
+    "build": "browserify index.js --standalone l0g -o dist/Logger.js -t [ babelify --presets [ @babel/preset-react ] --plugins [ @babel/plugin-proposal-class-properties ] ]",
     "build:docs": "jsdoc -c jsdoc.conf.json -r --verbose ./",
     "watch": "npm-watch"
   },
@@ -15,27 +15,26 @@
   "author": "moritz.roessler@gmail.com",
   "license": "ISC",
   "dependencies": {
-    "@babel/node": "^7.12.10",
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@types/jest": "^26.0.13",
+    "@babel/preset-react": "^7.12.10",
     "ansi_up": "^4.0.4",
     "chalk": "^4.1.0",
     "chokidar": "^3.4.3",
     "dotenv": "^8.2.0",
     "moment": "^2.29.1",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-globals": "^1.4.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
     "stacktracey": "^2.0.14"
   },
   "watch": {
     "build:docs": "*.js"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.13",
+    "@babel/node": "^7.12.10",
     "@babel/cli": "^7.12.10",
     "@babel/core": "^7.12.10",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
     "babel-eslint": "^10.1.0",
     "babelify": "^10.0.0",
+    "de-src": "github:C5h8NNaO4/de-src",
     "eslint": "^7.8.1",
     "eslint-config-google": "^0.14.0",
     "jest": "^26.4.2",
