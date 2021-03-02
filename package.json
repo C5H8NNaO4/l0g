@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
+    "install": "npm run build",
     "build": "browserify index.js --standalone l0g -o dist/Logger.js -t [ babelify --presets [ @babel/preset-react ] --plugins [ @babel/plugin-proposal-class-properties ] ]",
     "build:docs": "jsdoc -c jsdoc.conf.json -r --verbose ./",
     "watch": "npm-watch"

@@ -61,6 +61,7 @@ Color.colors = {
     ts: 'green',
     level: {
       info: 'green',
+      notice: 'yellow',
       warning: 'orange',
       error: 'red',
       debug: 'blue',
