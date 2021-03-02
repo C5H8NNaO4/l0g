@@ -4,20 +4,17 @@ const {
 
 const moment = require('moment');
 
-const util = require('util');
-
 const {
   Format
 } = require('../symbols');
 
-const {
-  Logger
-} = require('../Logger');
-
 class Formatter {
   constructor(fn) {
-    if (typeof fn === 'function') this._format = fn;
-    this.foo = "bar";
+    if (typeof fn === 'function') {
+      this._format = fn;
+    }
+
+    this.foo = 'bar';
   }
 
   transformTagArgs(options, strs, ...args) {
@@ -47,7 +44,11 @@ class Formatter {
       level,
       message
     } = options;
-    if (this._format) return this._format(options);
+
+    if (this._format) {
+      return this._format(options);
+    }
+
     return `${ts} ${level}: ${message}`;
   }
 
@@ -55,7 +56,7 @@ class Formatter {
     return moment(ts).toISOString();
   } // static transform (instance, options) {
   //   // if (typeof instance.transformTag === 'function')
-  //   //   options.tag = 
+  //   //   options.tag =
   //   if (Array.isArray(options.tag) && options.tag[0].raw)
   //     options.message = instance.tag(...options.tag);
   //   if (typeof instance.transform === 'function')
@@ -65,7 +66,7 @@ class Formatter {
 
 
   static format(instance, options) {
-    options = instance.transform(options); //Formatter.transform(instance, options);
+    options = instance.transform(options); // Formatter.transform(instance, options);
 
     return instance.format(options);
   }
