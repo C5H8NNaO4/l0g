@@ -17,7 +17,7 @@ class Color extends MapFormatter {
 Color.colorByType = type => (v, formatter) => !formatter.colors.type[type]?v:chalk.keyword(formatter.colors.type[type])(v);
 Color.formatMap = new Map([
   [Color.isString, [(value, formatter) => !formatter.colors.type.string?value:chalk.keyword(formatter.colors.type.string)(value)]],
-  [oftype('number'), chalk.keyword('cyan')],
+  [oftype('number'), (v, formatter) => Color.colorByType('number')(v, formatter)],
   [Color.isArray, [Color.colorByType('array')]],
   [Color.isError, (v, formatter) => Color.colorByType('error')(v.message, formatter)],
   [Color.isObject, [Color.colorByType('object')]],
